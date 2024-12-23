@@ -1,0 +1,77 @@
+import random
+from tkinter import *
+
+# 메인 창 생성
+window = Tk()
+window.title("자리 바꾸기")
+window.geometry("500x500")
+window.resizable(True, True)
+
+# 전역 변수로 현재 화면을 관리
+current_frame = None
+
+def switch_to_frame(new_frame):
+    """현재 화면을 제거하고 새 화면으로 전환"""
+    global current_frame
+    if current_frame is not None:
+        current_frame.destroy() 
+    current_frame = new_frame
+    current_frame.pack(fill="both", expand=True)
+
+def main_menu():
+    """메인 메뉴 화면"""
+    frame = Frame(window)
+    Label(frame, text="자리 바꾸기 프로그램").pack(pady=20)
+    Button(frame, text="자리 섞기 시작", command=input_screen).pack(pady=10)
+    switch_to_frame(frame)
+
+def input_screen():
+    """분단 입력 화면"""
+    frame = Frame(window)
+    Label(frame, text="분단 수와 줄 수를 입력하세요").pack(pady=20)
+
+    Label(frame, text="분단 수:").pack()
+    m_entry = Entry(frame)
+    m_entry.pack()
+
+    Label(frame, text="줄 수:").pack()
+    n_entry = Entry(frame)
+    n_entry.pack()
+
+    def on_confirm():
+        try:
+            m = int(m_entry.get())
+            n = int(n_entry.get())
+            result_screen(m, n)
+        except ValueError:
+            Label(frame, text="유효한 숫자를 입력하세요!", fg="red").pack()
+
+    Button(frame, text="확인", command=on_confirm).pack(pady=10)
+    Button(frame, text="뒤로 가기", command=main_menu).pack(pady=10)
+
+    switch_to_frame(frame)
+
+def result_screen(m, n):
+    """결과 화면"""
+    frame = Frame(window)
+    Label(frame, text="자리 배치 결과").pack(pady=20)
+
+    # 자리 섞기 로직
+    x = m * n
+    seats = list(range(1, x + 1))
+    random.shuffle(seats)
+
+    for i in range(n):
+        row = seats[i * m:(i + 1) * m]
+        Label(frame, text=" ".join(f"[ {num} ]" for num in row)).pack()
+
+    Button(frame, text="다시 섞기", command=lambda: input_screen()).pack(pady=10)
+    Button(frame, text="메인 메뉴로", command=main_menu).pack(pady=10)
+
+    switch_to_frame(frame)
+
+# 초기 화면 표시
+main_menu()
+
+# 이벤트 루프 시작
+window.mainloop()
